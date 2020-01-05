@@ -171,6 +171,8 @@ def get_parser(allow_policy_list=False):
         default=DEFAULT_DOMAIN)
     parser.add_argument(
         '--task', type=str, default=DEFAULT_TASK)
+    parser.add_argument(
+        '--metaenv_name', type=str, default='')
 
     parser.add_argument(
         '--checkpoint-replay-pool',
