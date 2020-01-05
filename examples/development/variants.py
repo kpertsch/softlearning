@@ -587,4 +587,6 @@ def get_variant_spec(args):
         variant_spec['run_params']['checkpoint_replay_pool'] = (
             args.checkpoint_replay_pool)
 
+    variant_spec['metaenv_name'] = args.metaenv_name
+
     return variant_spec

@@ -14,7 +14,7 @@ from softlearning.policies.utils import get_policy_from_variant
 from softlearning.samplers import rollouts
 from softlearning.utils.video import save_video
 
-from metaworld.envs.mujoco.sawyer_xyz import SawyerReachPushPickPlaceEnv
+from .meta_envs import get_metaenv
 from softlearning.environments.adapters.gym_adapter import GymAdapter
 
 
@@ -77,12 +77,12 @@ def load_checkpoint(checkpoint_path, session=None):
 
 
 def load_policy_and_environment(picklable, variant):
-    environment_params = (
-        variant['environment_params']['training']
-        if 'evaluation' in variant['environment_params']
-        else variant['environment_params']['training'])
+    # environment_params = (
+    #     variant['environment_params']['training']
+    #     if 'evaluation' in variant['environment_params']
+    #     else variant['environment_params']['training'])
 
-    environment = GymAdapter(domain=None, task=None, env=SawyerReachPushPickPlaceEnv()) 
+    environment = GymAdapter(domain=None, task=None, env=get_metaenv(variant['metaenv_name']))
     #environment = get_environment_from_params(environment_params)
 
     policy = get_policy_from_variant(variant, environment)
