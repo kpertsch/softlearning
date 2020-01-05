@@ -224,6 +224,7 @@ class SoftlearningEnv(metaclass=ABCMeta):
 
         for path in paths:
             for info_key, info_values in path.get('infos', {}).items():
+                if info_values[0] is None: continue
                 info_values = np.array(info_values)
                 results[info_key + '-first'].append(info_values[0])
                 results[info_key + '-last'].append(info_values[-1])

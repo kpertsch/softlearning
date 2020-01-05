@@ -43,6 +43,9 @@ def parse_args():
                         const=True,
                         default=True,
                         help="Evaluate policy deterministically.")
+    parser.add_argument('--metaenv_name',
+                        type=str,
+                        help='Name of meta-environment.')
 
     args = parser.parse_args()
 
@@ -76,13 +79,13 @@ def load_checkpoint(checkpoint_path, session=None):
     return picklable, variant, progress, metadata
 
 
-def load_policy_and_environment(picklable, variant):
+def load_policy_and_environment(picklable, variant, metaenv_name):
     # environment_params = (
     #     variant['environment_params']['training']
     #     if 'evaluation' in variant['environment_params']
     #     else variant['environment_params']['training'])
 
-    environment = GymAdapter(domain=None, task=None, env=get_metaenv(variant['metaenv_name']))
+    environment = GymAdapter(domain=None, task=None, env=get_metaenv(metaenv_name))
     #environment = get_environment_from_params(environment_params)
 
     policy = get_policy_from_variant(variant, environment)
@@ -97,10 +100,11 @@ def simulate_policy(checkpoint_path,
                     max_path_length,
                     render_kwargs,
                     video_save_path=None,
-                    evaluation_environment_params=None):
+                    evaluation_environment_params=None,
+                    metaenv_name=''):
     checkpoint_path = checkpoint_path.rstrip('/')
     picklable, variant, progress, metadata = load_checkpoint(checkpoint_path)
-    policy, environment = load_policy_and_environment(picklable, variant)
+    policy, environment = load_policy_and_environment(picklable, variant, metaenv_name)
     print("Loading done")
     render_kwargs = {**DEFAULT_RENDER_KWARGS, **render_kwargs}
     render_kwargs['mode'] = 'rgb_array'
