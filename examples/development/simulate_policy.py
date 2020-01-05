@@ -120,8 +120,9 @@ def simulate_policy(checkpoint_path,
     if video_save_path and render_kwargs.get('mode') == 'rgb_array':
         fps = 1 // getattr(environment, 'dt', 1/30)
         for i, path in enumerate(paths):
-            video_save_dir = os.path.expanduser('/tmp/simulate_policy/')
-            video_save_path = os.path.join(video_save_dir, f'episode_{i}.mp4')
+            if video_save_path is None:
+                video_save_path = os.path.expanduser('/tmp/simulate_policy/')
+            video_save_path = os.path.join(video_save_path, f'episode_{i}.mp4')
             save_video(path['images'], video_save_path, fps=fps)
 
     return paths

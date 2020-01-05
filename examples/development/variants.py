@@ -216,9 +216,9 @@ TOTAL_STEPS_PER_UNIVERSE_DOMAIN_TASK = {
 
 
 MAX_PATH_LENGTH_PER_UNIVERSE_DOMAIN_TASK = {
-    DEFAULT_KEY: 1000,
+    DEFAULT_KEY: 150,
     'gym': {
-        DEFAULT_KEY: 1000,
+        DEFAULT_KEY: 150,
         'Point2DEnv': {
             DEFAULT_KEY: 50,
         },
@@ -507,7 +507,7 @@ def get_variant_spec_base(universe, domain, task, policy, algorithm):
             'kwargs': {
                 'max_path_length': get_max_path_length(universe, domain, task),
                 'min_pool_size': get_max_path_length(universe, domain, task),
-                'batch_size': 256,
+                'batch_size': 128,  # 256
             }
         },
         'run_params': {
