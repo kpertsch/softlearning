@@ -19,6 +19,9 @@ from softlearning.utils.misc import set_seed
 from softlearning.utils.tensorflow import initialize_tf_variables
 from examples.instrument import run_example_local
 
+from metaworld.envs.mujoco.sawyer_xyz import SawyerReachPushPickPlaceEnv
+from softlearning.environments.adapters.gym_adapter import GymAdapter
+
 tf.compat.v1.disable_eager_execution()
 
 
@@ -43,13 +46,17 @@ class ExperimentRunner(tune.Trainable):
     def _build(self):
         variant = copy.deepcopy(self._variant)
 
-        environment_params = variant['environment_params']
-        training_environment = self.training_environment = (
-            get_environment_from_params(environment_params['training']))
-        evaluation_environment = self.evaluation_environment = (
-            get_environment_from_params(environment_params['evaluation'])
-            if 'evaluation' in environment_params
-            else training_environment)
+        #environment_params = variant['environment_params']
+        #training_environment = self.training_environment = (
+        #    get_environment_from_params(environment_params['training']))
+        #evaluation_environment = self.evaluation_environment = (
+        #    get_environment_from_params(environment_params['evaluation'])
+        #    if 'evaluation' in environment_params
+        #    else training_environment)
+        training_environment = self.training_environment = \
+            GymAdapter(domain=None, task=None, env=SawyerReachPushPickPlaceEnv())
+        evaluation_environment = self.evaluation_environment = \
+            GymAdapter(domain=None, task=None, env=SawyerReachPushPickPlaceEnv())
 
         replay_pool = self.replay_pool = (
             get_replay_pool_from_variant(variant, training_environment))

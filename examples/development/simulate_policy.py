@@ -14,9 +14,12 @@ from softlearning.policies.utils import get_policy_from_variant
 from softlearning.samplers import rollouts
 from softlearning.utils.video import save_video
 
+from metaworld.envs.mujoco.sawyer_xyz import SawyerReachPushPickPlaceEnv
+from softlearning.environments.adapters.gym_adapter import GymAdapter
+
 
 DEFAULT_RENDER_KWARGS = {
-    'mode': 'human',
+    'mode': 'rgb_array',
 }
 
 
@@ -79,7 +82,8 @@ def load_policy_and_environment(picklable, variant):
         if 'evaluation' in variant['environment_params']
         else variant['environment_params']['training'])
 
-    environment = get_environment_from_params(environment_params)
+    environment = GymAdapter(domain=None, task=None, env=SawyerReachPushPickPlaceEnv()) 
+    #environment = get_environment_from_params(environment_params)
 
     policy = get_policy_from_variant(variant, environment)
     policy.set_weights(picklable['policy_weights'])
@@ -97,7 +101,9 @@ def simulate_policy(checkpoint_path,
     checkpoint_path = checkpoint_path.rstrip('/')
     picklable, variant, progress, metadata = load_checkpoint(checkpoint_path)
     policy, environment = load_policy_and_environment(picklable, variant)
+    print("Loading done")
     render_kwargs = {**DEFAULT_RENDER_KWARGS, **render_kwargs}
+    render_kwargs['mode'] = 'rgb_array'
 
     with policy.set_deterministic(deterministic):
         paths = rollouts(num_rollouts,
@@ -105,6 +111,7 @@ def simulate_policy(checkpoint_path,
                          policy,
                          path_length=max_path_length,
                          render_kwargs=render_kwargs)
+    print("Rollout done")
 
     if video_save_path and render_kwargs.get('mode') == 'rgb_array':
         fps = 1 // getattr(environment, 'dt', 1/30)
@@ -119,7 +126,8 @@ def simulate_policy(checkpoint_path,
 if __name__ == '__main__':
     gpu_options = tf.GPUOptions(allow_growth=True)
     session = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
-    tf.keras.backend.set_session(session)
+    #tf.keras.backend.set_session(session)
 
     args = parse_args()
+    print("Let's start")
     simulate_policy(**vars(args))
