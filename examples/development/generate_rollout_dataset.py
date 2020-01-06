@@ -4,6 +4,8 @@ import json
 import os
 from pathlib import Path
 import pickle
+import h5py
+import tqdm
 
 import tensorflow as tf
 import pandas as pd
@@ -12,7 +14,7 @@ import numpy as np
 from softlearning.environments.utils import (
     get_environment_from_params, get_environment)
 from softlearning.policies.utils import get_policy_from_variant
-from softlearning.samplers import rollouts
+from softlearning.samplers import rollout
 from softlearning.utils.video import save_video
 
 from .meta_envs import get_metaenv
@@ -35,14 +37,14 @@ def parse_args():
                         type=json.loads,
                         default='{}',
                         help="Kwargs for rollouts renderer.")
-    parser.add_argument('--video-save-path',
+    parser.add_argument('--data-save-path',
                         type=Path,
                         default=None)
     parser.add_argument('--deterministic', '-d',
                         type=lambda x: bool(strtobool(x)),
                         nargs='?',
-                        const=True,
-                        default=True,
+                        const=False,
+                        default=False,
                         help="Evaluate policy deterministically.")
     parser.add_argument('--metaenv_name',
                         type=str,
@@ -81,13 +83,7 @@ def load_checkpoint(checkpoint_path, session=None):
 
 
 def load_policy_and_environment(picklable, variant, metaenv_name):
-    # environment_params = (
-    #     variant['environment_params']['training']
-    #     if 'evaluation' in variant['environment_params']
-    #     else variant['environment_params']['training'])
-
     environment = GymAdapter(domain=None, task=None, env=get_metaenv(metaenv_name))
-    #environment = get_environment_from_params(environment_params)
 
     policy = get_policy_from_variant(variant, environment)
     policy.set_weights(picklable['policy_weights'])
@@ -100,8 +96,7 @@ def simulate_policy(checkpoint_path,
                     num_rollouts,
                     max_path_length,
                     render_kwargs,
-                    video_save_path=None,
-                    evaluation_environment_params=None,
+                    data_save_path=None,
                     metaenv_name=''):
     checkpoint_path = checkpoint_path.rstrip('/')
     picklable, variant, progress, metadata = load_checkpoint(checkpoint_path)
@@ -110,32 +105,32 @@ def simulate_policy(checkpoint_path,
     render_kwargs = {**DEFAULT_RENDER_KWARGS, **render_kwargs}
     render_kwargs['mode'] = 'rgb_array'
 
+    if not os.path.exists(data_save_path):
+        os.makedirs(data_save_path)
+
     with policy.set_deterministic(deterministic):
-        paths = rollouts(num_rollouts,
-                         environment,
-                         policy,
-                         path_length=max_path_length,
-                         render_kwargs=render_kwargs)
-    print("Rollout done")
+        for i in tqdm.tqdm(range(num_rollouts)):
+            path = rollout(environment,
+                             policy,
+                             path_length=max_path_length,
+                             render_kwargs=render_kwargs)
 
-    if video_save_path and render_kwargs.get('mode') == 'rgb_array':
-        fps = 1 // getattr(environment, 'dt', 1/30)
-        if video_save_path is None:
-            video_save_path = os.path.expanduser('/tmp/simulate_policy/')
-        
-        # save individual rollout videos
-        #for i, path in enumerate(paths):
-        #    video_save_path_full = os.path.join(video_save_path, f'episode_{i}.mp4')
-        #    save_video(path['images'], video_save_path_full, fps=fps)
-        
-        # make combined videos for easier comparison
-        path_images = [path['images'] for path in paths]
-        mean_img = np.asarray(np.sum(np.array(path_images), axis=0) / len(path_images), dtype=path_images[0].dtype)
-        comb_videos = np.concatenate(path_images + [mean_img], axis=2)
-        save_video(comb_videos, os.path.join(video_save_path, 'combined.mp4'), fps=fps)
-        
+            # save rollout to file
+            f = h5py.File(os.path.join(data_save_path, "rollout_{}.h5".format(i)), "w")
+            f.create_dataset("traj_per_file", data=np.array([1]))
 
-    return paths
+            traj_data = f.create_group("traj0")       # store trajectory info in traj0 group
+            traj_data.create_dataset("states", data=path['observations']['observations'])
+            traj_data.create_dataset("images", data=path['images'])
+            traj_data.create_dataset("actions", data=path['actions'])
+
+            is_terminal_idxs = np.nonzero(path['terminals'])    # build pad-mask that indicates how long sequence is
+            pad_mask = np.zeros((path['terminals'].shape[0],))
+            pad_mask[:is_terminal_idxs[0]] = 1.
+
+            f.close()
+
+    print("Dataset generation done")
 
 
 if __name__ == '__main__':
