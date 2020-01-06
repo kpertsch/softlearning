@@ -11,6 +11,8 @@ from .softlearning_env import SoftlearningEnv
 from softlearning.environments.gym import register_environments
 from softlearning.utils.gym import is_continuous_space
 
+from metaworld.envs.mujoco.sawyer_xyz.base import SawyerXYZEnv
+
 
 def parse_domain_task(gym_id):
     domain_task_parts = gym_id.split('-')
@@ -144,8 +146,8 @@ class GymAdapter(SoftlearningEnv):
         return observation
 
     def render(self, *args, width=100, height=100, **kwargs):
-        if isinstance(self._env.unwrapped, MujocoEnv):
-            self._env.render(*args, width=width, height=height, **kwargs)
+        if isinstance(self._env.unwrapped, MujocoEnv) or isinstance(self._env.unwrapped, SawyerXYZEnv):
+            return self._env.render(*args, width=width, height=height, **kwargs)
 
         return self._env.render(*args, **kwargs)
 

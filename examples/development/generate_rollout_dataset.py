@@ -23,6 +23,8 @@ from softlearning.environments.adapters.gym_adapter import GymAdapter
 
 DEFAULT_RENDER_KWARGS = {
     'mode': 'rgb_array',
+    'width': 128,
+    'height': 128,
 }
 
 
