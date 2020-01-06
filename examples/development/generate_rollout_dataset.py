@@ -124,7 +124,7 @@ def simulate_policy(checkpoint_path,
             traj_data.create_dataset("images", data=path['images'])
             traj_data.create_dataset("actions", data=path['actions'])
 
-            is_terminal_idxs = np.nonzero(path['terminals'])    # build pad-mask that indicates how long sequence is
+            is_terminal_idxs = np.nonzero(path['terminals'][:, 0])[0]    # build pad-mask that indicates how long sequence is   
             pad_mask = np.zeros((path['terminals'].shape[0],))
             pad_mask[:is_terminal_idxs[0]] = 1.
 
