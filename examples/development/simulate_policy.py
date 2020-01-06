@@ -7,6 +7,7 @@ import pickle
 
 import tensorflow as tf
 import pandas as pd
+import numpy as np
 
 from softlearning.environments.utils import (
     get_environment_from_params, get_environment)
@@ -119,11 +120,20 @@ def simulate_policy(checkpoint_path,
 
     if video_save_path and render_kwargs.get('mode') == 'rgb_array':
         fps = 1 // getattr(environment, 'dt', 1/30)
-        for i, path in enumerate(paths):
-            if video_save_path is None:
-                video_save_path = os.path.expanduser('/tmp/simulate_policy/')
-            video_save_path = os.path.join(video_save_path, f'episode_{i}.mp4')
-            save_video(path['images'], video_save_path, fps=fps)
+        if video_save_path is None:
+            video_save_path = os.path.expanduser('/tmp/simulate_policy/')
+        
+        # save individual rollout videos
+        #for i, path in enumerate(paths):
+        #    video_save_path_full = os.path.join(video_save_path, f'episode_{i}.mp4')
+        #    save_video(path['images'], video_save_path_full, fps=fps)
+        
+        # make combined videos for easier comparison
+        path_images = [path['images'] for path in paths]
+        mean_img = np.asarray(np.sum(np.array(path_images), axis=0) / len(path_images), dtype=path_images[0].dtype)
+        comb_videos = np.concatenate(path_images + [mean_img], axis=2)
+        save_video(comb_videos, os.path.join(video_save_path, 'combined.mp4'), fps=fps)
+        
 
     return paths
 
