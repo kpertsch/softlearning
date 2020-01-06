@@ -1,3 +1,46 @@
+# Meta-World Softlearning
+
+This repository is an adaptation of the official SAC repository to solve [Meta-World](https://meta-world.github.io/) tasks. To use this repository, please:
+
+1. Follow the installation instructions for this repository from below.
+2. Install the [Meta-World repository](https://github.com/rlworkgroup/metaworld) using the provided installation instructions (using the "from-source" installation if you want to modify the Meta-World environments).
+3. Fix bug in Meta-World rendering by changing [this](https://github.com/rlworkgroup/metaworld/blob/2957703f095ff5ca9c44c0295b80b4bb46aeca12/metaworld/envs/mujoco/mujoco_env.py#L145) line to:
+```
+self.viewer = mujoco_py.MjRenderContextOffscreen(self.sim, -1)
+```
+4. Train policies on the respective Meta-World environments by setting the appropriate ```--metaenv_name=<name_of_env>``` parameter for the training command below (for a list of environment names see the [meta_envs.py](https://github.com/kpertsch/softlearning/blob/master/examples/development/meta_envs.py) file). Example command:
+```
+softlearning run_example_local examples.development \
+        --universe=gym \
+        --domain=HalfCheetah \
+        --task=v3 \
+        --exp-name=metaworld-pick_place \
+        --checkpoint-frequency=10 \
+        --metaenv_name=reach_push_pick_place \
+        --server-port=4327
+```
+**Note**: The ```--server-port``` argument is important if you want to run multiple runs at the same time, just make sure to use different server ports for each of them.
+5. You can visualize rollouts from the resulting policy by using the visualization command from below, again adding the appropriate ```--metaenv_name``` parameter (set ```--deterministic=False``` to get stochastic rollouts). Example command:
+```
+python -m examples.development.simulate_policy \
+        <path_to_experiment/checkpoint_{}> \
+        --max-path-length=150 \
+        --num-rollouts=3 \
+        --video-save-path=<path_to_save_folder> \
+        --metaenv_name=reach_push_pick_place \
+        --deterministic=False
+```
+6. You can generate a dataset of policy rollouts in HDF5 format by using the [generate_rollout_dataset.py](https://github.com/kpertsch/softlearning/blob/master/examples/development/generate_rollout_dataset.py) script. Example command (here ```--deterministic=False``` by default):
+```
+python -m examples.development.generate_rollout_dataset \
+        <path_to_experiment/checkpoint_{}> \
+        --max-path-length=150 \
+        --num-rollouts=3 \
+        --data-save-path=<path_to_save_folder> \
+        --metaenv_name=reach_push_pick_place
+```
+
+
 # Softlearning
 
 Softlearning is a deep reinforcement learning toolbox for training maximum entropy policies in continuous domains. The implementation is fairly thin and primarily optimized for our own development purposes. It utilizes the tf.keras modules for most of the model classes (e.g. policies and value functions). We use Ray for the experiment orchestration. Ray Tune and Autoscaler implement several neat features that enable us to seamlessly run the same experiment scripts that we use for local prototyping to launch large-scale experiments on any chosen cloud service (e.g. GCP or AWS), and intelligently parallelize and distribute training for effective resource allocation.
