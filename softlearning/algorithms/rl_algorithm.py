@@ -31,6 +31,8 @@ class RLAlgorithm(Checkpointable):
     def __init__(
             self,
             sampler,
+            z_dim,
+            z_type,
             n_epochs=1000,
             train_every_n_steps=1,
             n_train_repeat=1,
@@ -86,8 +88,8 @@ class RLAlgorithm(Checkpointable):
         self._epoch = 0
         self._timestep = 0
         self._num_train_steps = 0
-        self.z_dim = 1
-        self.z_type = 'normal'
+        self.z_dim = z_dim
+        self.z_type = z_type
 
     def _build(self):
         self._training_ops = {}
@@ -363,6 +365,8 @@ class RLAlgorithm(Checkpointable):
                 evaluation_env,
                 policy,
                 self.sampler._max_path_length,
+                z_dim = self.z_dim,
+                z_type = self.z_type,
                 render_kwargs=self._eval_render_kwargs)
 
         should_save_video = (

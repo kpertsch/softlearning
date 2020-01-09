@@ -12,7 +12,8 @@ DEFAULT_KEY = "__DEFAULT_KEY__"
 
 M = 256
 NUM_COUPLING_LAYERS = 2
-
+z_dim_out = None
+z_type_out = None
 
 ALGORITHM_PARAMS_BASE = {
     'kwargs': {
@@ -412,8 +413,9 @@ def get_checkpoint_frequency(spec):
 def get_policy_params(spec):
     # config = spec.get('config', spec)
     policy_params = GAUSSIAN_POLICY_PARAMS_BASE.copy()
+    policy_params['z_dim'] = z_dim_out
+    policy_params['z_type'] = z_type_out
     return policy_params
-
 
 def get_total_timesteps(universe, domain, task):
     level_result = TOTAL_STEPS_PER_UNIVERSE_DOMAIN_TASK.copy()
@@ -428,12 +430,14 @@ def get_total_timesteps(universe, domain, task):
     return level_result
 
 
-def get_algorithm_params(universe, domain, task):
+def get_algorithm_params(universe, domain, task, z_dim, z_type):
     total_timesteps = get_total_timesteps(universe, domain, task)
     epoch_length = get_epoch_length(universe, domain, task)
     n_epochs = total_timesteps / epoch_length
     assert n_epochs == int(n_epochs)
     algorithm_params = {
+        'z_dim': z_dim,
+        'z_type': z_type,
         'kwargs': {
             'n_epochs': int(n_epochs),
             'n_initial_exploration_steps': tune.sample_from(
@@ -453,12 +457,19 @@ def get_environment_params(universe, domain, task):
     return environment_params
 
 
-def get_variant_spec_base(universe, domain, task, policy, algorithm):
+def get_variant_spec_base(universe, domain, task, policy, algorithm, z_dim, z_type):
+
+    global z_dim_out
+    global z_type_out
+    z_dim_out = z_dim
+    z_type_out = z_type
+
     algorithm_params = deep_update(
         ALGORITHM_PARAMS_BASE,
         ALGORITHM_PARAMS_ADDITIONAL.get(algorithm, {}),
-        get_algorithm_params(universe, domain, task),
+        get_algorithm_params(universe, domain, task, z_dim, z_type),
     )
+
     variant_spec = {
         'git_sha': get_git_rev(__file__),
 
@@ -478,6 +489,8 @@ def get_variant_spec_base(universe, domain, task, policy, algorithm):
         'policy_params': tune.sample_from(get_policy_params),
         'exploration_policy_params': {
             'type': 'UniformPolicy',
+            'z_dim': z_dim,
+            'z_type': z_type,
             'kwargs': {
                 'observation_keys': tune.sample_from(lambda spec: (
                     spec.get('config', spec)
@@ -489,6 +502,8 @@ def get_variant_spec_base(universe, domain, task, policy, algorithm):
         },
         'Q_params': {
             'type': 'double_feedforward_Q_function',
+            'z_dim': z_dim,
+            'z_type': z_type,
             'kwargs': {
                 'hidden_layer_sizes': (M, M),
                 'observation_keys': None,
@@ -498,12 +513,16 @@ def get_variant_spec_base(universe, domain, task, policy, algorithm):
         'algorithm_params': algorithm_params,
         'replay_pool_params': {
             'type': 'SimpleReplayPool',
+            'z_dim' : z_dim,
+            'z_type': z_type,
             'kwargs': {
                 'max_size': int(1e6),
             },
         },
         'sampler_params': {
             'type': 'SimpleSampler',
+            'z_dim': z_dim,
+            'z_type': z_type,
             'kwargs': {
                 'max_path_length': get_max_path_length(universe, domain, task),
                 'min_pool_size': get_max_path_length(universe, domain, task),
@@ -533,10 +552,12 @@ def get_variant_spec_image(universe,
                            task,
                            policy,
                            algorithm,
+                           z_dim,
+                           z_type,
                            *args,
                            **kwargs):
     variant_spec = get_variant_spec_base(
-        universe, domain, task, policy, algorithm, *args, **kwargs)
+        universe, domain, task, policy, algorithm, z_dim, z_type, *args, **kwargs)
 
     if is_image_env(universe, domain, task, variant_spec):
         preprocessor_params = {
@@ -578,10 +599,10 @@ def get_variant_spec_image(universe,
 
 
 def get_variant_spec(args):
-    universe, domain, task = args.universe, args.domain, args.task
+    universe, domain, task, z_dim, z_type = args.universe, args.domain, args.task, args.z_dim, args.z_type
 
     variant_spec = get_variant_spec_image(
-        universe, domain, task, args.policy, args.algorithm)
+        universe, domain, task, args.policy, args.algorithm, z_dim, z_type)
 
     if args.checkpoint_replay_pool is not None:
         variant_spec['run_params']['checkpoint_replay_pool'] = (

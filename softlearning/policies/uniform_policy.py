@@ -9,6 +9,8 @@ from softlearning.models.utils import create_inputs
 
 class UniformPolicy(BasePolicy):
     def __init__(self,
+                 z_dim,
+                 z_type,
                  input_shapes,
                  output_shape,
                  action_range,
@@ -19,7 +21,8 @@ class UniformPolicy(BasePolicy):
 
         self._output_shape = output_shape
         self._action_range = action_range
-        self.z_dim = 1
+        self.z_dim = z_dim
+        self.z_type = z_type
 
         super(UniformPolicy, self).__init__(*args, **kwargs)
 

@@ -154,6 +154,16 @@ def add_ray_tune_args(parser):
         default=4321,
         help=tune_help_string("Port number for launching TuneServer."))
 
+    parser.add_argument(
+        '--z_dim',
+        type=int,
+        default=0
+    )
+    parser.add_argument(
+        '--z_type',
+        type=str,
+        default=None
+    )
     return parser
 
 

@@ -23,11 +23,13 @@ def get_sampler_from_variant(variant, *args, **kwargs):
     sampler_params = variant['sampler_params']
     sampler_type = sampler_params['type']
 
+    z_dim = sampler_params['z_dim']
+    z_type = sampler_params['z_type']
     sampler_args = sampler_params.get('args', ())
     sampler_kwargs = sampler_params.get('kwargs', {}).copy()
 
     sampler = SAMPLERS[sampler_type](
-        *sampler_args, *args, **sampler_kwargs, **kwargs)
+        z_dim = z_dim, z_type = z_type, *sampler_args, *args, **sampler_kwargs, **kwargs)
 
     return sampler
 
@@ -48,12 +50,17 @@ DEFAULT_HUMAN_RENDER_KWARGS = {
 def rollout(env,
             policy,
             path_length,
+            z_dim=0,
+            z_type='',
             sampler_class=simple_sampler.SimpleSampler,
             callback=None,
             render_kwargs=None,
             break_on_terminal=True):
-    pool = replay_pools.SimpleReplayPool(env, max_size=path_length)
+
+    pool = replay_pools.SimpleReplayPool(z_dim, z_type, env, max_size=path_length)
     sampler = sampler_class(
+        z_dim = z_dim,
+        z_type = z_type,
         max_path_length=path_length,
         min_pool_size=None,
         batch_size=None)

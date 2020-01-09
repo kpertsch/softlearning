@@ -32,6 +32,9 @@ def get_policy(policy_type, *args, **kwargs):
 
 def get_policy_from_params(policy_params, env, *args, **kwargs):
     policy_type = policy_params['type']
+    z_dim = policy_params['z_dim']
+    z_type = policy_params['z_type']
+
     policy_kwargs = deepcopy(policy_params.get('kwargs', {}))
 
     observation_preprocessors_params = policy_kwargs.pop(
@@ -59,6 +62,8 @@ def get_policy_from_params(policy_params, env, *args, **kwargs):
     action_range = (env.action_space.low, env.action_space.high)
 
     policy = POLICY_FUNCTIONS[policy_type](
+        z_dim = z_dim,
+        z_type = z_type,
         input_shapes=observation_shapes,
         output_shape=env.action_shape,
         action_range=action_range,

@@ -18,9 +18,13 @@ DEFAULT_REPLAY_POOL = 'SimpleReplayPool'
 
 def get_replay_pool_from_params(replay_pool_params, env, *args, **kwargs):
     replay_pool_type = replay_pool_params['type']
+    z_dim = replay_pool_params['z_dim']
+    z_type = replay_pool_params['z_type']
     replay_pool_kwargs = replay_pool_params['kwargs'].copy()
 
     replay_pool = POOL_CLASSES[replay_pool_type](
+        z_dim = z_dim,
+        z_type = z_type,
         *args,
         environment=env,
         **replay_pool_kwargs,

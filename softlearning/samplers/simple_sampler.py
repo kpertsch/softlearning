@@ -7,7 +7,7 @@ from softlearning.models.utils import flatten_input_structure
 from .base_sampler import BaseSampler
 
 class SimpleSampler(BaseSampler):
-    def __init__(self, **kwargs):
+    def __init__(self, z_dim, z_type, **kwargs):
         super(SimpleSampler, self).__init__(**kwargs)
 
         self._path_length = 0
@@ -19,7 +19,8 @@ class SimpleSampler(BaseSampler):
         self._current_observation = None
         self._total_samples = 0
         ################################################################################################################
-        self.z_dim = 1                                                                                                  # dimension of latent space
+        self.z_dim = z_dim                                                                                              # dimension of latent space
+        self.z_type = z_type
         self.z_type = 'normal'                                                                                          # type of latent distribution
         self.cur_z = None
         ################################################################################################################

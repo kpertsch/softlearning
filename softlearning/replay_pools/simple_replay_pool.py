@@ -5,6 +5,8 @@ from .flexible_replay_pool import FlexibleReplayPool, Field
 
 class SimpleReplayPool(FlexibleReplayPool):
     def __init__(self,
+                 z_dim,
+                 z_type,
                  environment,
                  *args,
                  extra_fields=None,
@@ -18,8 +20,8 @@ class SimpleReplayPool(FlexibleReplayPool):
         self._observation_space = observation_space
         self._action_space = action_space
 
-        self.z_dim = 1
-
+        self.z_dim = z_dim
+        self.z_type = z_type
         fields = {
             'observations': {
                 name: Field(

@@ -25,6 +25,8 @@ def get_Q_function_from_variant(variant, env, *args, **kwargs):
     Q_params = deepcopy(variant['Q_params'])
     Q_type = deepcopy(Q_params['type'])
     Q_kwargs = deepcopy(Q_params['kwargs'])
+    z_dim = Q_params['z_dim']
+    z_type = Q_params['z_type']
 
     observation_preprocessors_params = Q_kwargs.pop(
         'observation_preprocessors_params', {}).copy()
@@ -56,7 +58,6 @@ def get_Q_function_from_variant(variant, env, *args, **kwargs):
         'actions': action_preprocessor,
     }
 
-    z_dim = 1
     original_dim = input_shapes['observations']['observations'].as_list()[0]
     updated_dim = original_dim + z_dim
     input_shapes['observations']['observations'] = tf.TensorShape([updated_dim])

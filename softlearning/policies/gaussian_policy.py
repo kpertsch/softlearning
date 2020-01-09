@@ -15,6 +15,8 @@ from .base_policy import LatentSpacePolicy
 
 class GaussianPolicy(LatentSpacePolicy):
     def __init__(self,
+                 z_dim,
+                 z_type,
                  input_shapes,
                  output_shape,
                  action_range,
@@ -35,7 +37,8 @@ class GaussianPolicy(LatentSpacePolicy):
         self._output_shape = output_shape
         self._squash = squash
         self._name = name
-        self.z_dim = 1
+        self.z_dim = z_dim
+        self.z_type = z_type
 
         super(GaussianPolicy, self).__init__(*args, **kwargs)
 
