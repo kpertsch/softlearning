@@ -19,10 +19,20 @@ class UniformPolicy(BasePolicy):
 
         self._output_shape = output_shape
         self._action_range = action_range
+        self.z_dim = 2
 
         super(UniformPolicy, self).__init__(*args, **kwargs)
 
         inputs_flat = create_inputs(input_shapes)
+
+        # adding z_dim in input dimension
+        original_dim = inputs_flat[0].shape[1]
+        updated_dim = original_dim + self.z_dim
+
+        inputs_flat = [tf.keras.layers.Input(
+            shape=(updated_dim,),
+            dtype=tf.float32
+        )]
 
         self.inputs = inputs_flat
 

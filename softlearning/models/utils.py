@@ -29,6 +29,7 @@ def flatten_input_structure(inputs):
 
 
 def create_input(name, input_shape):
+
     input_ = tf.keras.layers.Input(
         shape=input_shape,
         name=name,

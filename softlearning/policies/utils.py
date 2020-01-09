@@ -44,6 +44,8 @@ def get_policy_from_params(policy_params, env, *args, **kwargs):
         if key in observation_keys
     ))
 
+    # add one more dimenstion to observation space
+
     observation_preprocessors = OrderedDict()
     for name, observation_shape in observation_shapes.items():
         preprocessor_params = observation_preprocessors_params.get(name, None)

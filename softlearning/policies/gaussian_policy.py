@@ -35,8 +35,13 @@ class GaussianPolicy(LatentSpacePolicy):
         self._output_shape = output_shape
         self._squash = squash
         self._name = name
+        self.z_dim = 2
 
         super(GaussianPolicy, self).__init__(*args, **kwargs)
+
+        original_dim = input_shapes['observations'].as_list()[0]
+        updated_dim = original_dim + self.z_dim
+        input_shapes['observations'] = tf.TensorShape([updated_dim])
 
         inputs_flat = create_inputs(input_shapes)
         preprocessors_flat = (

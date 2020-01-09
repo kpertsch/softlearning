@@ -3,6 +3,7 @@ import copy
 import glob
 import pickle
 import sys
+import time
 
 import tensorflow as tf
 from ray import tune
@@ -19,7 +20,7 @@ from softlearning.utils.misc import set_seed
 from softlearning.utils.tensorflow import initialize_tf_variables
 from examples.instrument import run_example_local
 
-from .meta_envs import get_metaenv
+from examples.development.meta_envs import get_metaenv
 from softlearning.environments.adapters.gym_adapter import GymAdapter
 
 tf.compat.v1.disable_eager_execution()
@@ -53,6 +54,7 @@ class ExperimentRunner(tune.Trainable):
         #    get_environment_from_params(environment_params['evaluation'])
         #    if 'evaluation' in environment_params
         #    else training_environment)
+        print('debugging here')
         training_environment = self.training_environment = \
             GymAdapter(domain=None, task=None, env=get_metaenv(variant['metaenv_name']))
         evaluation_environment = self.evaluation_environment = \

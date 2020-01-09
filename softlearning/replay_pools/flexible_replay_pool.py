@@ -64,6 +64,7 @@ class FlexibleReplayPool(ReplayPool):
     def _initialize_data(self):
         """Initialize data for the pool."""
         fields = flatten(self.fields)
+
         for field_name, field_attrs in fields.items():
             self.data[field_name] = self._initialize_field(field_attrs)
 
