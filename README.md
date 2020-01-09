@@ -17,7 +17,9 @@ softlearning run_example_local examples.development \
         --exp-name=metaworld-pick_place \
         --checkpoint-frequency=10 \
         --metaenv_name=reach_push_pick_place \
-        --server-port=4327
+        --server-port=4327 \
+        --z_dim=2 \
+        --z_type=normal
 ```
 **Note**: The ```--server-port``` argument is important if you want to run multiple runs at the same time, just make sure to use different server ports for each of them.
 5. You can visualize rollouts from the resulting policy by using the visualization command from below, again adding the appropriate ```--metaenv_name``` parameter (set ```--deterministic=False``` to get stochastic rollouts). Example command:
