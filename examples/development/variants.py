@@ -430,7 +430,7 @@ def get_total_timesteps(universe, domain, task):
     return level_result
 
 
-def get_algorithm_params(universe, domain, task, z_dim, z_type):
+def get_algorithm_params(universe, domain, task, z_dim, z_type, z_weight):
     total_timesteps = get_total_timesteps(universe, domain, task)
     epoch_length = get_epoch_length(universe, domain, task)
     n_epochs = total_timesteps / epoch_length
@@ -438,6 +438,7 @@ def get_algorithm_params(universe, domain, task, z_dim, z_type):
     algorithm_params = {
         'z_dim': z_dim,
         'z_type': z_type,
+        'z_weight': z_weight,
         'kwargs': {
             'n_epochs': int(n_epochs),
             'n_initial_exploration_steps': tune.sample_from(
@@ -457,7 +458,7 @@ def get_environment_params(universe, domain, task):
     return environment_params
 
 
-def get_variant_spec_base(universe, domain, task, policy, algorithm, z_dim, z_type):
+def get_variant_spec_base(universe, domain, task, policy, algorithm, z_dim, z_type, z_weight):
 
     global z_dim_out
     global z_type_out
@@ -467,7 +468,7 @@ def get_variant_spec_base(universe, domain, task, policy, algorithm, z_dim, z_ty
     algorithm_params = deep_update(
         ALGORITHM_PARAMS_BASE,
         ALGORITHM_PARAMS_ADDITIONAL.get(algorithm, {}),
-        get_algorithm_params(universe, domain, task, z_dim, z_type),
+        get_algorithm_params(universe, domain, task, z_dim, z_type, z_weight),
     )
 
     variant_spec = {
@@ -554,10 +555,11 @@ def get_variant_spec_image(universe,
                            algorithm,
                            z_dim,
                            z_type,
+                           z_weight,
                            *args,
                            **kwargs):
     variant_spec = get_variant_spec_base(
-        universe, domain, task, policy, algorithm, z_dim, z_type, *args, **kwargs)
+        universe, domain, task, policy, algorithm, z_dim, z_type, z_weight, *args, **kwargs)
 
     if is_image_env(universe, domain, task, variant_spec):
         preprocessor_params = {
@@ -599,10 +601,10 @@ def get_variant_spec_image(universe,
 
 
 def get_variant_spec(args):
-    universe, domain, task, z_dim, z_type = args.universe, args.domain, args.task, args.z_dim, args.z_type
+    universe, domain, task, z_dim, z_type, z_weight = args.universe, args.domain, args.task, args.z_dim, args.z_type, args.z_weight
 
     variant_spec = get_variant_spec_image(
-        universe, domain, task, args.policy, args.algorithm, z_dim, z_type)
+        universe, domain, task, args.policy, args.algorithm, z_dim, z_type, z_weight)
 
     if args.checkpoint_replay_pool is not None:
         variant_spec['run_params']['checkpoint_replay_pool'] = (

@@ -30,8 +30,9 @@ def get_algorithm_from_variant(variant,
     algorithm_type = algorithm_params['type']
     z_dim = algorithm_params['z_dim']
     z_type = algorithm_params['z_type']
+    z_weight = algorithm_params['z_weight']
     algorithm_kwargs = deepcopy(algorithm_params['kwargs'])
     algorithm = ALGORITHM_CLASSES[algorithm_type](
-        variant, z_dim = z_dim, z_type = z_type, *args, **algorithm_kwargs, **kwargs)
+        variant, z_dim = z_dim, z_type = z_type, z_weight = z_weight, *args, **algorithm_kwargs, **kwargs)
 
     return algorithm

@@ -45,6 +45,7 @@ class SAC(RLAlgorithm):
             policy,
             Qs,
             pool,
+            z_weight = 1.0,
             plotter=None,
 
             lr=3e-4,
@@ -107,6 +108,7 @@ class SAC(RLAlgorithm):
 
         self.dis_hidden_layers_sizes = [256, 256]
         self.dis_output_size = 2*self.z_dim
+        self.z_weight = z_weight
 
         self._build()
 
@@ -271,6 +273,7 @@ class SAC(RLAlgorithm):
         normal_log_probs = normal_dist.log_prob(z_value)
         normal_log_probs = tf.clip_by_value(normal_log_probs, clip_value_min=-20, clip_value_max=20)
         discriminator_loss = -tf.reduce_mean(discriminator_log_probs) + tf.reduce_mean(normal_log_probs)
+        discriminator_loss = self.z_weight*discriminator_loss
 
         # TODO: add a custom loss here
         policy_kl_losses = (
