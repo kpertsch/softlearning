@@ -109,10 +109,6 @@ def simulate_policy(checkpoint_path,
     z_dim = variant['policy_params']['z_dim']
     z_type = variant['policy_params']['z_type']
 
-    print('-------------------------------------- z -----------------------------------------')
-    print(z_dim, z_type)
-    print('-------------------------------------- z -----------------------------------------')
-
     policy, environment = load_policy_and_environment(picklable, variant, metaenv_name)
     print("Loading done")
     render_kwargs = {**DEFAULT_RENDER_KWARGS, **render_kwargs}
