@@ -106,8 +106,12 @@ def simulate_policy(checkpoint_path,
     checkpoint_path = checkpoint_path.rstrip('/')
     picklable, variant, progress, metadata = load_checkpoint(checkpoint_path)
 
-    print(variant)
-    input()
+    z_dim = variant['policy_params']['z_dim']
+    z_type = variant['policy_params']['z_type']
+
+    print('-------------------------------------- z -----------------------------------------')
+    print(z_dim, z_type)
+    print('-------------------------------------- z -----------------------------------------')
 
     policy, environment = load_policy_and_environment(picklable, variant, metaenv_name)
     print("Loading done")
@@ -118,6 +122,8 @@ def simulate_policy(checkpoint_path,
         paths = rollouts(num_rollouts,
                          environment,
                          policy,
+                         z_dim = z_dim,
+                         z_type = z_type,
                          path_length=max_path_length,
                          render_kwargs=render_kwargs)
     print("Rollout done")
