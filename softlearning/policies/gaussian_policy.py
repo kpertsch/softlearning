@@ -35,7 +35,7 @@ class GaussianPolicy(LatentSpacePolicy):
         self._output_shape = output_shape
         self._squash = squash
         self._name = name
-        self.z_dim = 2
+        self.z_dim = 1
 
         super(GaussianPolicy, self).__init__(*args, **kwargs)
 

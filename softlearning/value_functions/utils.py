@@ -56,7 +56,7 @@ def get_Q_function_from_variant(variant, env, *args, **kwargs):
         'actions': action_preprocessor,
     }
 
-    z_dim = 2
+    z_dim = 1
     original_dim = input_shapes['observations']['observations'].as_list()[0]
     updated_dim = original_dim + z_dim
     input_shapes['observations']['observations'] = tf.TensorShape([updated_dim])

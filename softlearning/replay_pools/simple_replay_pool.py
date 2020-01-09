@@ -18,7 +18,7 @@ class SimpleReplayPool(FlexibleReplayPool):
         self._observation_space = observation_space
         self._action_space = action_space
 
-        self.z_dim = 2
+        self.z_dim = 1
 
         fields = {
             'observations': {

@@ -86,7 +86,7 @@ class RLAlgorithm(Checkpointable):
         self._epoch = 0
         self._timestep = 0
         self._num_train_steps = 0
-        self.z_dim = 2
+        self.z_dim = 1
         self.z_type = 'normal'
 
     def _build(self):

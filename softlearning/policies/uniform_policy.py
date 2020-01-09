@@ -19,7 +19,7 @@ class UniformPolicy(BasePolicy):
 
         self._output_shape = output_shape
         self._action_range = action_range
-        self.z_dim = 2
+        self.z_dim = 1
 
         super(UniformPolicy, self).__init__(*args, **kwargs)
 

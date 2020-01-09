@@ -19,7 +19,7 @@ class SimpleSampler(BaseSampler):
         self._current_observation = None
         self._total_samples = 0
         ################################################################################################################
-        self.z_dim = 2                                                                                                  # dimension of latent space
+        self.z_dim = 1                                                                                                  # dimension of latent space
         self.z_type = 'normal'                                                                                          # type of latent distribution
         self.cur_z = None
         ################################################################################################################
