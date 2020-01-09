@@ -105,6 +105,10 @@ def simulate_policy(checkpoint_path,
                     metaenv_name=''):
     checkpoint_path = checkpoint_path.rstrip('/')
     picklable, variant, progress, metadata = load_checkpoint(checkpoint_path)
+
+    print(variant)
+    input()
+
     policy, environment = load_policy_and_environment(picklable, variant, metaenv_name)
     print("Loading done")
     render_kwargs = {**DEFAULT_RENDER_KWARGS, **render_kwargs}
