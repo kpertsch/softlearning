@@ -15,7 +15,7 @@ from softlearning.policies.utils import get_policy_from_variant
 from softlearning.samplers import rollouts
 from softlearning.utils.video import save_video
 
-from .meta_envs import get_metaenv
+from examples.development.meta_envs import get_metaenv
 from softlearning.environments.adapters.gym_adapter import GymAdapter
 
 
