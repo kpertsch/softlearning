@@ -282,6 +282,15 @@ class SAC(RLAlgorithm):
             - policy_prior_log_probs
             + discriminator_loss)
 
+        # policy loss without custom loss
+        self.policy_loss_wo_custom = (
+            alpha * log_pis
+            - min_Q_log_target
+            - policy_prior_log_probs)
+
+        #custom loss
+        self.custom_loss = discriminator_loss
+
         assert policy_kl_losses.shape.as_list() == [None, 1]
 
         self._policy_losses = policy_kl_losses
@@ -302,7 +311,9 @@ class SAC(RLAlgorithm):
             ('Q_value', self._Q_values),
             ('Q_loss', self._Q_losses),
             ('policy_loss', self._policy_losses),
-            ('alpha', self._alpha)
+            ('alpha', self._alpha),
+            ('policy_loss_wo_custom', self.policy_loss_wo_custom),
+            ('custom_loss', self.custom_loss),
         ))
 
         diagnostic_metrics = OrderedDict((
