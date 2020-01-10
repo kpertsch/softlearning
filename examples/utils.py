@@ -162,7 +162,7 @@ def add_ray_tune_args(parser):
     parser.add_argument(
         '--z_type',
         type=str,
-        default=None
+        default=''
     )
     parser.add_argument(
         '--z_weight',

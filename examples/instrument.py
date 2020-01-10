@@ -94,7 +94,7 @@ def generate_experiment_kwargs(variant_spec, command_line_args):
         else None)
 
     datetime_prefix = datetimestamp()
-    experiment_id = '-'.join((datetime_prefix, command_line_args.exp_name))
+    experiment_id = '-'.join((datetime_prefix, command_line_args.exp_name, str(command_line_args.z_dim), command_line_args.z_type, str(command_line_args.z_weight)))
 
     variant_spec = add_command_line_args_to_variant_spec(
         variant_spec, command_line_args)
