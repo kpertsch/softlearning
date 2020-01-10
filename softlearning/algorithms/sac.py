@@ -291,6 +291,11 @@ class SAC(RLAlgorithm):
         #custom loss
         self.custom_loss = discriminator_loss
 
+        # print average custom loss
+        avg_custom_loss = tf.reduce_mean(self.custom_loss)
+        print_avg_custom_loss =tf.print("custom_loss:", avg_custom_loss)
+        self._training_ops({'custom_loss_op': print_avg_custom_loss})
+
         assert policy_kl_losses.shape.as_list() == [None, 1]
 
         self._policy_losses = policy_kl_losses
