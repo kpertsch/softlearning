@@ -29,7 +29,7 @@ def get_sampler_from_variant(variant, *args, **kwargs):
     sampler_kwargs = sampler_params.get('kwargs', {}).copy()
 
     sampler = SAMPLERS[sampler_type](
-        z_dim = z_dim, z_type = z_type, *sampler_args, *args, **sampler_kwargs, **kwargs)
+        z_dim=z_dim, z_type=z_type, *sampler_args, *args, **sampler_kwargs, **kwargs)
 
     return sampler
 

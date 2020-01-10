@@ -21,7 +21,6 @@ class SimpleSampler(BaseSampler):
         ################################################################################################################
         self.z_dim = z_dim                                                                                              # dimension of latent space
         self.z_type = z_type
-        self.z_type = 'normal'                                                                                          # type of latent distribution
         self.cur_z = None
         ################################################################################################################
 
