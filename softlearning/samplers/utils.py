@@ -109,6 +109,7 @@ def rollout(env,
     if render_mode == 'rgb_array':
         path['images'] = np.stack(images, axis=0)
 
+
     return path
 
 

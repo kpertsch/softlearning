@@ -275,6 +275,9 @@ class SAC(RLAlgorithm):
         discriminator_loss = -tf.reduce_mean(discriminator_log_probs) + tf.reduce_mean(normal_log_probs)
         discriminator_loss = self.z_weight*discriminator_loss
 
+        self.discriminator_log_probs_avg = tf.reduce_mean(discriminator_log_probs)
+        self.normal_log_probs_avg = tf.reduce_mean(normal_log_probs)
+
         # TODO: add a custom loss here
         policy_kl_losses = (
             alpha * log_pis
@@ -290,11 +293,6 @@ class SAC(RLAlgorithm):
 
         #custom loss
         self.custom_loss = discriminator_loss
-
-        # print average custom loss
-        avg_custom_loss = tf.reduce_mean(self.custom_loss)
-        print_avg_custom_loss =tf.print("custom_loss:", avg_custom_loss)
-        self._training_ops({'custom_loss_op': print_avg_custom_loss})
 
         assert policy_kl_losses.shape.as_list() == [None, 1]
 
@@ -319,6 +317,8 @@ class SAC(RLAlgorithm):
             ('alpha', self._alpha),
             ('policy_loss_wo_custom', self.policy_loss_wo_custom),
             ('custom_loss', self.custom_loss),
+            ('discriminator_log_probs', self.discriminator_log_probs_avg),
+            ('normal_log_probs', self.normal_log_probs_avg),
         ))
 
         diagnostic_metrics = OrderedDict((

@@ -95,6 +95,29 @@ def load_policy_and_environment(picklable, variant, metaenv_name):
     return policy, environment
 
 
+def get_raw_observations(paths, z_dim):
+    observations = []
+    observatoin_dim = paths[0]['observations']['observations'].shape[1]
+    for i in range(len((paths))):
+        observations.append(paths[i]['observations']['observations'][:,:observatoin_dim-z_dim])
+
+    return  observations
+
+
+def find_entropy(observations):
+    eef_observations = observations[:,:3]
+    H, edges = np.histogramdd(eef_observations, bins = 50)
+    H = H/np.sum(H)
+    eps = 1e-7
+    entropy = -1*np.sum(H*np.log(H+eps))
+    return entropy
+
+def calculate_diversity(raw_observations):
+    observations = np.array(raw_observations)
+    observations = observations.reshape(-1, observations.shape[-1])
+    diversity = find_entropy(observations)
+    return diversity
+
 def simulate_policy(checkpoint_path,
                     deterministic,
                     num_rollouts,
@@ -123,6 +146,10 @@ def simulate_policy(checkpoint_path,
                          path_length=max_path_length,
                          render_kwargs=render_kwargs)
     print("Rollout done")
+
+    raw_observations = get_raw_observations(paths, z_dim)
+    diversity = calculate_diversity(raw_observations)
+    print('diversity measure: {}'.format(diversity))
 
     if video_save_path and render_kwargs.get('mode') == 'rgb_array':
         fps = 1 // getattr(environment, 'dt', 1/30)
