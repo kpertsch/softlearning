@@ -149,7 +149,7 @@ def simulate_policy(checkpoint_path,
 
     raw_observations = get_raw_observations(paths, z_dim)
     diversity = calculate_diversity(raw_observations)
-    print('diversity measure: {}'.format(diversity))
+    print('##################### diversity measure: {} ############################'.format(diversity))
 
     if video_save_path and render_kwargs.get('mode') == 'rgb_array':
         fps = 1 // getattr(environment, 'dt', 1/30)
