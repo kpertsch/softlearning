@@ -97,12 +97,11 @@ def load_policy_and_environment(picklable, variant, metaenv_name):
 
 def get_raw_observations(paths, z_dim):
     observations = []
-    observatoin_dim = paths[0]['observations']['observations'].shape[1]
+    observation_dim = paths[0]['observations']['observations'].shape[1]
     for i in range(len((paths))):
-        observations.append(paths[i]['observations']['observations'][:,:observatoin_dim-z_dim])
+        observations.append(paths[i]['observations']['observations'][:,:observation_dim-z_dim])
 
     return  observations
-
 
 def find_entropy(observations):
     eef_observations = observations[:,:3]
@@ -112,10 +111,23 @@ def find_entropy(observations):
     entropy = -1*np.sum(H*np.log(H+eps))
     return entropy
 
+
+def find_ind_entropy(observations):
+    eef_observations = observations[:,:,:3]
+    entropy = 0
+    for i in range(eef_observations.shape[1]):
+        cur_observations = eef_observations[:,i,:]
+        H, edges = np.histogramdd(cur_observations, bins=50)
+        H = H / np.sum(H)
+        eps = 1e-7
+        entropy += -1 * np.sum(H * np.log(H + eps))
+    return entropy/eef_observations.shape[1]
+
 def calculate_diversity(raw_observations):
     observations = np.array(raw_observations)
-    observations = observations.reshape(-1, observations.shape[-1])
-    diversity = find_entropy(observations)
+    combined_observations = observations.reshape(-1, observations.shape[-1])
+    diversity = find_entropy(combined_observations)
+    diversity = find_ind_entropy(observations)
     return diversity
 
 def simulate_policy(checkpoint_path,
