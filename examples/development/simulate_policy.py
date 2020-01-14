@@ -123,11 +123,27 @@ def find_ind_entropy(observations):
         entropy += -1 * np.sum(H * np.log(H + eps))
     return entropy/eef_observations.shape[1]
 
+
+def find_variance(observations):
+    eef_observations = observations[:, :, :3]
+    variance = 0
+    for i in range(eef_observations.shape[1]):
+        cur_observations = eef_observations[:,i,:]
+        mean_observation = np.sum(cur_observations, axis=0)
+        print(mean_observation.shape)
+        cur_variance = np.sum(np.square(cur_observations - mean_observation))
+        cur_variance = cur_variance/cur_observations.shape[0]
+        variance += cur_variance
+
+    variance = variance/eef_observations.shape[1]
+    return variance
+
 def calculate_diversity(raw_observations):
     observations = np.array(raw_observations)
     combined_observations = observations.reshape(-1, observations.shape[-1])
     diversity = find_entropy(combined_observations)
     diversity = find_ind_entropy(observations)
+    diversity = find_variance(observations)
     return diversity
 
 def simulate_policy(checkpoint_path,
