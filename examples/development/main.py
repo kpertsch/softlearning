@@ -54,7 +54,6 @@ class ExperimentRunner(tune.Trainable):
         #    get_environment_from_params(environment_params['evaluation'])
         #    if 'evaluation' in environment_params
         #    else training_environment)
-        print('debugging here')
         training_environment = self.training_environment = \
             GymAdapter(domain=None, task=None, env=get_metaenv(variant['metaenv_name']))
         evaluation_environment = self.evaluation_environment = \
