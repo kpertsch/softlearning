@@ -86,8 +86,6 @@ class RLAlgorithm(Checkpointable):
         self._epoch = 0
         self._timestep = 0
         self._num_train_steps = 0
-        self.z_dim = 2
-        self.z_type = 'normal'
 
     def _build(self):
         self._training_ops = {}
@@ -111,10 +109,6 @@ class RLAlgorithm(Checkpointable):
             - reward
             - terminals
         """
-
-        # TODO: change the observation space by adding z variable for policy placehoder
-
-        # placeholder for policy which contains z values
         self._placeholders = {
             'observations': {
                 name: tf.compat.v1.placeholder(
@@ -123,24 +117,12 @@ class RLAlgorithm(Checkpointable):
                         if np.issubdtype(observation_space.dtype, np.floating)
                         else observation_space.dtype
                     ),
-                    shape=(None, observation_space.shape[0] + self.z_dim),
+                    shape=(None, *observation_space.shape),
                     name=name)
                 for name, observation_space
                 in self._training_environment.observation_space.spaces.items()
             },
             'next_observations': {
-                name: tf.compat.v1.placeholder(
-                    dtype=(
-                        np.float32
-                        if np.issubdtype(observation_space.dtype, np.floating)
-                        else observation_space.dtype
-                    ),
-                    shape=(None, observation_space.shape[0] + self.z_dim),
-                    name=name)
-                for name, observation_space
-                in self._training_environment.observation_space.spaces.items()
-            },
-            'raw_observations': {
                 name: tf.compat.v1.placeholder(
                     dtype=(
                         np.float32
@@ -170,11 +152,6 @@ class RLAlgorithm(Checkpointable):
             'iteration': tf.compat.v1.placeholder(
                 tf.int64, shape=(), name='iteration',
             ),
-            'z_value': tf.compat.v1.placeholder(
-                tf.float32,
-                shape=(None, self.z_dim),
-                name = 'z_value'
-            )
         }
 
     def _initial_exploration_hook(self, env, initial_exploration_policy, pool):

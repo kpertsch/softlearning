@@ -8,7 +8,9 @@ from metaworld.envs.mujoco.sawyer_xyz import \
     SawyerBasketballEnv, SawyerReachPushPickPlaceWallEnv, SawyerPushBackEnv, SawyerPickOutOfHoleEnv,\
     SawyerShelfRemoveEnv, SawyerNutDisassembleEnv, SawyerDoorLockEnv, SawyerDoorUnlockEnv, SawyerSweepToolEnv,\
     SawyerButtonPressWallEnv, SawyerButtonPressTopdownWallEnv, SawyerHandlePressSideEnv, SawyerHandlePullSideEnv,\
-    SawyerPlateSlideEnv, SawyerPlateSlideBackEnv, SawyerPlateSlideSideEnv, SawyerPlateSlideBackSideEnv
+    SawyerPlateSlideEnv, SawyerPlateSlideBackEnv, SawyerPlateSlideSideEnv, SawyerPlateSlideBackSideEnv, \
+    SawyerReachPushPickPlaceSawyerReachEnv, SawyerReachPushPickPlaceSawyerPushEnv, \
+    SawyerReachPushPickPlaceWallSawyerPushEnv, SawyerReachPushPickPlaceWallSawyerReachEnv
 
 
 META_ENVS = {
@@ -58,6 +60,10 @@ META_ENVS = {
     'plate_slide_back': SawyerPlateSlideBackEnv,
     'plate_slide_side': SawyerPlateSlideSideEnv,
     'plate_slide_back_side': SawyerPlateSlideBackSideEnv,
+    'reach_push_pick_place_reach': SawyerReachPushPickPlaceSawyerReachEnv,
+    'reach_push_pick_place_push' : SawyerReachPushPickPlaceSawyerPushEnv,
+    'reach_push_pick_place_wall_reach' : SawyerReachPushPickPlaceWallSawyerReachEnv,
+    'reach_push_pick_place_wall_push' : SawyerReachPushPickPlaceWallSawyerPushEnv,
 }
 
 

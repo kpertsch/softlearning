@@ -18,14 +18,12 @@ class SimpleReplayPool(FlexibleReplayPool):
         self._observation_space = observation_space
         self._action_space = action_space
 
-        self.z_dim = 2
-
         fields = {
             'observations': {
                 name: Field(
                     name=name,
                     dtype=observation_space.dtype,
-                    shape=(observation_space.shape[0]+self.z_dim,))
+                    shape=observation_space.shape)
                 for name, observation_space
                 in observation_space.spaces.items()
             },
@@ -33,7 +31,7 @@ class SimpleReplayPool(FlexibleReplayPool):
                 name: Field(
                     name=name,
                     dtype=observation_space.dtype,
-                    shape=(observation_space.shape[0]+self.z_dim,))
+                    shape=observation_space.shape)
                 for name, observation_space
                 in observation_space.spaces.items()
             },

@@ -18,11 +18,6 @@ class SimpleSampler(BaseSampler):
         self._n_episodes = 0
         self._current_observation = None
         self._total_samples = 0
-        ################################################################################################################
-        self.z_dim = 2                                                                                                  # dimension of latent space
-        self.z_type = 'normal'                                                                                          # type of latent distribution
-        self.cur_z = None
-        ################################################################################################################
 
     @property
     def _policy_input(self):
@@ -54,12 +49,10 @@ class SimpleSampler(BaseSampler):
     def sample(self):
         if self._current_observation is None:
             self._current_observation = self.env.reset()
-            self._current_observation = self.append_initial_observation(self._current_observation)                      # add z value at the starting of each episode
 
         action = self.policy.actions_np(self._policy_input)[0]
 
         next_observation, reward, terminal, info = self.env.step(action)
-        next_observation = self.append_next_observation(next_observation, self._current_observation)                    # add z value in next observations
         self._path_length += 1
         self._path_return += reward
         self._total_samples += 1
@@ -123,28 +116,3 @@ class SimpleSampler(BaseSampler):
         })
 
         return diagnostics
-
-    ####################################################################################################################
-    def append_next_observation(self, next_observation, current_observation):
-        next_observation_list = next_observation['observations'].tolist()
-        z_values = self.cur_z
-        next_observation_list.extend(z_values)
-        next_observation_dict = {}
-        next_observation_dict['observations'] = np.array(next_observation_list)
-        return next_observation_dict
-
-    # sample from standard normal
-    def samples_z(self):
-        self.cur_z = np.random.normal(0,1,self.z_dim).tolist()
-        return self.cur_z
-
-    # add z value into observation
-    def append_initial_observation(self, current_observation):
-        observations_np = current_observation['observations']
-        z = self.samples_z()
-        observations_list = observations_np.tolist()
-        observations_list.extend(z)
-        observations_dict = {}
-        observations_dict['observations'] = np.array(observations_list)
-        return observations_dict
-    ####################################################################################################################

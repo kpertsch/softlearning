@@ -1,6 +1,5 @@
 from collections import OrderedDict
 from copy import deepcopy
-import tensorflow as tf
 
 from softlearning.preprocessors.utils import get_preprocessor_from_params
 from . import vanilla
@@ -55,11 +54,6 @@ def get_Q_function_from_variant(variant, env, *args, **kwargs):
         'observations': observation_preprocessors,
         'actions': action_preprocessor,
     }
-
-    z_dim = 2
-    original_dim = input_shapes['observations']['observations'].as_list()[0]
-    updated_dim = original_dim + z_dim
-    input_shapes['observations']['observations'] = tf.TensorShape([updated_dim])
 
     Q_function = VALUE_FUNCTIONS[Q_type](
         input_shapes=input_shapes,

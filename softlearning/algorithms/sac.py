@@ -105,9 +105,6 @@ class SAC(RLAlgorithm):
 
         self._save_full_state = save_full_state
 
-        self.dis_hidden_layers_sizes = [256, 256]
-        self.dis_output_size = 2*self.z_dim
-
         self._build()
 
     def _build(self):
@@ -184,7 +181,6 @@ class SAC(RLAlgorithm):
 
         self._training_ops.update({'Q': tf.group(Q_training_ops)})
 
-    # TODO: Add a custom loss in actor updates
     def _init_actor_update(self):
         """Create minimization operations for policy and entropy.
 
@@ -243,41 +239,10 @@ class SAC(RLAlgorithm):
         Q_log_targets = tuple(Q(Q_inputs) for Q in self._Qs)
         min_Q_log_target = tf.reduce_min(Q_log_targets, axis=0)
 
-        # TODO: create a discriminator here
-        z_value = self._placeholders['z_value']
-        discriminator_inputs = flatten_input_structure({
-            name: self._placeholders['raw_observations'][name]
-            for name in self._policy.observation_keys
-        })[0]
-
-        model = tf.keras.Sequential()
-        model.add(tf.keras.layers.Dense(self.dis_hidden_layers_sizes[0], input_shape=(int(discriminator_inputs.shape[1]),)))
-        model.add(tf.keras.layers.Dense(self.dis_output_size))
-        discriminator_output = model(discriminator_inputs)
-
-        # TODO: create a custom loss using discriminator
-        normal_dist = tfp.distributions.MultivariateNormalDiag(
-            loc=tf.zeros(self.z_dim),
-            scale_diag=tf.ones(self.z_dim))
-        mean_dist = discriminator_output[:,:self.z_dim]
-        log_scale_dist = discriminator_output[:,self.z_dim:]
-        log_scale_dist = tf.clip_by_value(log_scale_dist, clip_value_min=-10, clip_value_max=2)
-        scale_dist = tf.exp(log_scale_dist)
-        output_dist = tfp.distributions.MultivariateNormalDiag(
-            loc=mean_dist,
-            scale_diag=scale_dist)
-        discriminator_log_probs = output_dist.log_prob(z_value)
-        discriminator_log_probs = tf.clip_by_value(discriminator_log_probs, clip_value_min=-20, clip_value_max=20)
-        normal_log_probs = normal_dist.log_prob(z_value)
-        normal_log_probs = tf.clip_by_value(normal_log_probs, clip_value_min=-20, clip_value_max=20)
-        discriminator_loss = -tf.reduce_mean(discriminator_log_probs) + tf.reduce_mean(normal_log_probs)
-
-        # TODO: add a custom loss here
         policy_kl_losses = (
             alpha * log_pis
             - min_Q_log_target
-            - policy_prior_log_probs
-            + discriminator_loss)
+            - policy_prior_log_probs)
 
         assert policy_kl_losses.shape.as_list() == [None, 1]
 
@@ -349,20 +314,10 @@ class SAC(RLAlgorithm):
             if key in batch_flat.keys()
         }
 
-        # add raw observations
-        feed_dict[placeholders_flat[('raw_observations','observations')]] = self.remove_z(batch_flat[('observations','observations')])
         if iteration is not None:
             feed_dict[self._placeholders['iteration']] = iteration
 
-        # add z_value
-        feed_dict[placeholders_flat[('z_value',)]] = self.sampled_z(batch_flat[('observations','observations')])
         return feed_dict
-
-    def remove_z(self, observations):
-        return observations[:,:observations.shape[1]-self.z_dim]
-
-    def sampled_z(self, observations):
-        return observations[:,observations.shape[1]-self.z_dim:]
 
     def get_diagnostics(self,
                         iteration,
