@@ -10,7 +10,8 @@ from metaworld.envs.mujoco.sawyer_xyz import \
     SawyerButtonPressWallEnv, SawyerButtonPressTopdownWallEnv, SawyerHandlePressSideEnv, SawyerHandlePullSideEnv,\
     SawyerPlateSlideEnv, SawyerPlateSlideBackEnv, SawyerPlateSlideSideEnv, SawyerPlateSlideBackSideEnv, \
     SawyerReachPushPickPlaceSawyerReachEnv, SawyerReachPushPickPlaceSawyerPushEnv, \
-    SawyerReachPushPickPlaceWallSawyerPushEnv, SawyerReachPushPickPlaceWallSawyerReachEnv
+    SawyerReachPushPickPlaceWallSawyerPushEnv, SawyerReachPushPickPlaceWallSawyerReachEnv, \
+    SawyerHandlePressEnv, SawyerHandlePullEnv, SawyerPickAndPlaceEnv, SawyerPickAndPlaceWsgEnv
 
 
 META_ENVS = {
@@ -64,6 +65,10 @@ META_ENVS = {
     'reach_push_pick_place_push' : SawyerReachPushPickPlaceSawyerPushEnv,
     'reach_push_pick_place_wall_reach' : SawyerReachPushPickPlaceWallSawyerReachEnv,
     'reach_push_pick_place_wall_push' : SawyerReachPushPickPlaceWallSawyerPushEnv,
+    'handle_press' : SawyerHandlePressEnv,
+    'handle_pull' : SawyerHandlePullEnv,
+    'pick_and_place': SawyerPickAndPlaceEnv,
+    'pick_and_place_wsg': SawyerPickAndPlaceWsgEnv,
 }
 
 
