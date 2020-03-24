@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from copy import deepcopy
+from tensorflow import TensorShape
 
 from softlearning.preprocessors.utils import get_preprocessor_from_params
 
@@ -43,6 +44,9 @@ def get_policy_from_params(policy_params, env, *args, **kwargs):
         (key, value) for key, value in env.observation_shape.items()
         if key in observation_keys
     ))
+
+    # HACK: set observation shape to 6
+    observation_shapes = OrderedDict({'observations': TensorShape([6])})
 
     observation_preprocessors = OrderedDict()
     for name, observation_shape in observation_shapes.items():

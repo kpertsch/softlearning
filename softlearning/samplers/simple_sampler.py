@@ -26,6 +26,9 @@ class SimpleSampler(BaseSampler):
             for key in self.policy.observation_keys
         })
 
+        # HACK: only get first 6 dimensions of the observation
+        observation[0] = observation[0][:, :6]
+
         return observation
 
     def _process_sample(self,

@@ -115,3 +115,5 @@ vendor/*
 
 .mujoco/
 .vscode/
+
+exp_rollouts/

@@ -40,6 +40,12 @@ python -m examples.development.generate_rollout_dataset \
         --metaenv_name=reach_push_pick_place
 ```
 
+# Notes by Jingyun
+
+At this point we assume that the policy takes observations of dimension 6 but the environment works with an observation space of 12. To resolve this inconsistency, the following files have been edited to set dimensionalities right. If you need to remove these changes, please remove these edits (these edits have a comment with `HACK` in it).
+
+- `softlearning/policies/utils.py`
+- `softlearning/samplers/simple_sampler.py`
 
 # Softlearning
 
