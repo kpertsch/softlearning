@@ -6,6 +6,7 @@ from pathlib import Path
 import pickle
 import h5py
 import tqdm
+import cv2
 
 import tensorflow as tf
 import pandas as pd
@@ -93,13 +94,23 @@ def load_policy_and_environment(picklable, variant, metaenv_name):
     return policy, environment
 
 
+def resize_video(images, dim=64):
+    ret = np.zeros((images.shape[0], dim, dim, 3))
+
+    for i in range(images.shape[0]):
+        ret[i] = cv2.resize(images[i], dsize=(dim, dim), interpolation=cv2.INTER_CUBIC)
+
+    return ret.astype(np.uint8)
+
+
 def simulate_policy(checkpoint_path,
                     deterministic,
                     num_rollouts,
                     max_path_length,
                     render_kwargs,
                     data_save_path=None,
-                    metaenv_name=''):
+                    metaenv_name='',
+                    image_resize_dim=64):
     checkpoint_path = checkpoint_path.rstrip('/')
     picklable, variant, progress, metadata = load_checkpoint(checkpoint_path)
     policy, environment = load_policy_and_environment(picklable, variant, metaenv_name)
@@ -123,10 +134,14 @@ def simulate_policy(checkpoint_path,
 
             traj_data = f.create_group("traj0")       # store trajectory info in traj0 group
             traj_data.create_dataset("states", data=path['observations']['observations'])
-            traj_data.create_dataset("images", data=path['images'])
+            traj_data.create_dataset("images", data=resize_video(path['images'], dim=image_resize_dim))
             traj_data.create_dataset("actions", data=path['actions'])
 
-            is_terminal_idxs = np.nonzero(path['terminals'][:, 0])[0]    # build pad-mask that indicates how long sequence is   
+            if np.sum(path['terminals']) == 0:
+                # episode didn't end
+                path['terminals'][-1, 0] = True
+
+            is_terminal_idxs = np.nonzero(path['terminals'][:, 0])[0]    # build pad-mask that indicates how long sequence is
             pad_mask = np.zeros((path['terminals'].shape[0],))
             pad_mask[:is_terminal_idxs[0]] = 1.
             traj_data.create_dataset("pad_mask", data=pad_mask)

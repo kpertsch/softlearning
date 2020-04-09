@@ -103,3 +103,6 @@ Werkzeug==0.16.0
 
 # data generation
 tqdm
+
+# metaworld
+git+https://github.com/rlworkgroup/metaworld.git@b3682a7147b18ca0c02e746d27c6127c0e9c93db

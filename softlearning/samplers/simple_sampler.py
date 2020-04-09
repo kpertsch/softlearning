@@ -6,6 +6,9 @@ from flatten_dict import flatten, unflatten
 from softlearning.models.utils import flatten_input_structure
 from .base_sampler import BaseSampler
 
+from softlearning.environments.adapters.gym_adapter import GymAdapter
+from metaworld.envs.mujoco.multitask_env import MultiClassMultiTaskEnv
+
 class SimpleSampler(BaseSampler):
     def __init__(self, **kwargs):
         super(SimpleSampler, self).__init__(**kwargs)
@@ -26,8 +29,18 @@ class SimpleSampler(BaseSampler):
             for key in self.policy.observation_keys
         })
 
-        # HACK: only get first 6 dimensions of the observation
-        observation[0] = observation[0][:, :6]
+        # HACK: only get the adequate number of dimensions
+        if self.env.__class__ == GymAdapter and self.env.unwrapped.__class__ == MultiClassMultiTaskEnv:
+            env_class_init = self.env.unwrapped.active_env.__class__.__init__
+            obs_type_param_ix = env_class_init.__code__.co_varnames.index('obs_type') - 1
+            default_obs_type = env_class_init.__defaults__[obs_type_param_ix]
+            if default_obs_type == 'plain':
+                observation[0] = observation[0][:, :6]
+            elif default_obs_type == 'with_goal':
+                observation[0] = np.concatenate([observation[0][:, :6], observation[0][:, -3:]], -1)
+            elif default_obs_type == 'with_goal_init_obs':
+                init_pos = np.reshape(self.env.unwrapped.active_env.stick_init_pos, (1,3))
+                observation[0] = np.concatenate([observation[0][:, :9], init_pos, observation[0][:, -3:]], -1)
 
         return observation
 
